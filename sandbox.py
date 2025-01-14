@@ -1,22 +1,23 @@
-import numpy as np
-from pyHH.src.pyhh.models import HHModel
-from pyHH.src.pyhh.simulations import Simulation
-import matplotlib.pyplot as plt
+from manimlib import *
 
-# customize a neuron model if desired
-model = HHModel()
-model.gNa = 100  # typically 120
-model.gK = 5  # typically 36
-model.EK = -35  # typically -12
-
-# customize a stimulus waveform
-stim = np.zeros(20000)
-stim[7000:13000] = 50  # add a square pulse
-
-# simulate the model cell using the custom waveform
-sim = Simulation(model)
-sim.Run(stimulusWaveform=stim, stepSizeMs=0.01)
-plt.plot(sim.times,sim.Vm)
-plt.show()
-
-print("stop")
+class ArrowAlongBezierShape(Scene):
+    def construct(self):
+        # Define control points for the Bézier curve
+        start = LEFT
+        control1 = UP + LEFT
+        control2 = UP + RIGHT
+        end = RIGHT
+        
+        # Create the Bézier curve path
+        bezier_curve = CubicBezier(start, control1, control2, end)
+        
+        # Create a line along the Bézier curve to indicate the path
+        path = Line(start, end)  # This line won't be used for the arrow shape but is for visualization
+        
+        # Create an arrow object that follows the Bézier curve
+        arrow = Arrow(start, end, buff=0.1)
+        arrow.set_angle(bezier_curve.angle_at_point(0))  # Start with the angle of the curve at the start point
+        self.add(arrow)
+        
+        # Animate the arrow following the Bézier curve path
+        self.play(MoveAlongPath(arrow, bezier_curve), run_time=3)
