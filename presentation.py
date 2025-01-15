@@ -8,8 +8,6 @@ class Presentation(InteractiveScene):
         orchstra_cedit = TexText(r"Image Source: Berliner Philharmoniker", font_size=12).to_edge(DOWN+RIGHT, buff=0.2)
         orchestra_latent_text = TexText(r"Like musicians in an orchestra, neurons\\follow underlying \textbf{latent} dynamics.").move_to(2 * DOWN)
         latent_explanation = TexText(r"something that is hidden or not immediateley obvious", font_size=24).move_to(DOWN+LEFT)
-        # explanation_path = Line([-1,-1,0],[1,1,0])
-        # explanation_path = CubicBezier(get_smooth_cubic_bezier_handle_points([[0,0,0],[1,1,0],[3,5,0]]))
         arr = Arrow([-1,-0.5,0], [1,0.5,0])
         
         motivation_texts  = [TexText(r"This a mathematically dense paper."), TexText(r"The introduced models might be helpful\\for a lot of you in systems neuroscience."), TexText(r"We will build the modeling framework from\\the experimental side.").move_to(2*DOWN)]
@@ -584,12 +582,3 @@ class Presentation(InteractiveScene):
         for cl in cons_list:
             self.wait()
             self.play(Write(cl))
-            
-        
-        
-        
-        
- 
-        
-        
-        
