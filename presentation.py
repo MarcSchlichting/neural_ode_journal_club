@@ -76,10 +76,10 @@ class Presentation(InteractiveScene):
             TracingTail(dot, time_traced=10).match_color(dot)
             for dot in dots
         )
-        self.play(Write(spike_title))
         self.add(dots)
         self.add(tail)
         trails.set_opacity(0)
+        self.play(Write(spike_title))
         self.wait()
         self.play(
             *(
@@ -397,7 +397,10 @@ class Presentation(InteractiveScene):
         self.play(LaggedStart(ShowCreation(ax_pd),
                               Write(ax_pd_x_label),
                               Write(ax_pd_y_label)))
-        self.wait()
+        if not self.presenter_mode:
+            self.wait(5)
+        else:
+            self.wait()
         self.play(LaggedStart(Uncreate(ax_pd),
                               Uncreate(ax_pd_x_label),
                               Uncreate(ax_pd_y_label)))
