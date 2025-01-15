@@ -46,17 +46,33 @@ class Presentation(InteractiveScene):
         # Spike Recordings
         spike_title = TexText("Spike Data").to_edge(UP+LEFT)
         alpha = ValueTracker(0)
-        ax = [Axes([0,hh_t.max()],[hh_vm.min(), hh_vm.max()],height=0.4,width=15).to_edge(UP,buff=1)]
-        # ax[0].get_y_axis_label("V_0",edge=[0,0,0])
+        ax = [Axes([0,hh_t.max()],[hh_vm.min(), hh_vm.max()],height=0.4,width=15).to_edge(UP,buff=1.2)]
         xs = [np.stack([hh_t[0],hh_vm[0]],axis=1)]
         for i in range(1,hh_vm.shape[0]):
             ax.append(Axes([0,hh_t.max()],[hh_vm.min(), hh_vm.max()],height=0.4,width=15).next_to(ax[-1],DOWN))
             xs.append(np.stack([hh_t[i],hh_vm[i]],axis=1))
+        neuron_titles = Group(*[TexText(Rf"Neuron {i+1}",font_size=32).align_to(ax[i].get_edge_center(LEFT)+1.0 *RIGHT,UL) for i in range(len(ax))])
+        spike_time_titles = Group(*[Tex(Rf"t^{{({i+1})}}_1,\quad t^{{({i+1})}}_2,\quad t^{{({i+1})}}_3,\quad t^{{({i+1})}}_4,\quad t^{{({i+1})}}_5,\quad t^{{({i+1})}}_6,\quad \ldots",font_size=32).align_to(neuron_titles[i].get_corner(UP+LEFT)+2*RIGHT,UL) for i in range(len(ax))])
+        neuron_titles_line = Line(neuron_titles[0].get_corner(UP+LEFT)+1.7*RIGHT+0.1*UP, neuron_titles[-1].get_corner(DOWN+LEFT)+1.7*RIGHT+0.1*DOWN).set_stroke(WHITE,2)
+
+        last_spikes = - np.ones(len(ax))    # in alpha units, initially set to -1
+        spike_group = Group()
+        trails_cs = VGroup(*[VMobject().set_points(np.concatenate([xs[i],np.zeros((xs[i].shape[0],1))],axis=1)) for i in range(len(xs))])
         trails = VGroup(*[VMobject().set_points(ax[i].c2p(*xs[i].T)).set_stroke(BLUE_B, 2) for i in range(len(xs))])
         dots = Group(GlowDot(color=BLUE, radius=0.15) for i,x in enumerate(xs))
         def update_dots(dots, curves=trails):
-            for dot, curve in zip(dots, curves):
-                dot.move_to(curve.quick_point_from_proportion(alpha.get_value()))
+            for i, (dot, curve) in enumerate(zip(dots, curves)):
+                curve_point = curve.quick_point_from_proportion(alpha.get_value())
+                curve_point_cs = trails_cs[i].quick_point_from_proportion(alpha.get_value())
+                dot.move_to(curve_point)
+                # spike detection
+                if (curve_point_cs[1] > -15) and ((alpha.get_value() - last_spikes[i])>=0.01):  # adjust threshold for spiking
+                    # generate spike dot
+                    spike_dot = GlowDot(ax[i].c2p(curve_point_cs[0],0,curve_point_cs[2]),color=WHITE,radius=0.2)
+                    self.add(spike_dot)
+                    spike_group.add(spike_dot)
+                    last_spikes[i] = alpha.get_value()
+                    # print(i,curve_point_cs)
         dots.add_updater(update_dots)
         tail = VGroup(
             TracingTail(dot, time_traced=10).match_color(dot)
@@ -75,7 +91,16 @@ class Presentation(InteractiveScene):
             run_time=20,
         )
         self.wait()
-        self.play(Uncreate(spike_title))
+        self.play(LaggedStart(*[FadeOut(gd) for gd in spike_group],lag_ratio=0.03),
+                              LaggedStart(*[Write(nt) for nt in neuron_titles],
+                              *[Write(st) for st in spike_time_titles],
+                              ShowCreation(neuron_titles_line),lag_ratio=0.07))
+
+        self.wait()
+        self.play(LaggedStart(Uncreate(spike_title),
+                              *[Uncreate(nt) for nt in neuron_titles],
+                              Uncreate(neuron_titles_line),
+                              *[Uncreate(st) for st in spike_time_titles]))
 
         
         
@@ -111,9 +136,9 @@ class Presentation(InteractiveScene):
         self.wait()
         self.play(Write(poisson_tex_one))
         self.wait()
-        self.play(LaggedStart(Write(firing_rate),ShowCreation(firing_rate_curve)))
-        self.wait()
         self.play(LaggedStart(Write(spike_times[::-1]),*[ShowCreation(stc) for stc in spike_time_curves]))
+        self.wait()
+        self.play(LaggedStart(Write(firing_rate),ShowCreation(firing_rate_curve)))
         self.wait()
         self.play(LaggedStart(Uncreate(spike_times),
                               *[Uncreate(stc) for stc in spike_time_curves],
@@ -298,7 +323,7 @@ class Presentation(InteractiveScene):
         # self.add(ode_text)
         main_contribution = Group()
         main_contribution.add(TexText(r"Main Contribution of the Paper").move_to([0,0,0]))
-        main_contribution.add(Tex(r"\underbrace{f(\mathbf{z},t,u)=\mathrm{Artificial~Neural~Network}}_{\mathrm{Neural~ODE}}").move_to([0,-2,0]))
+        main_contribution.add(Tex(r"\underbrace{f(\mathbf{z}(t),\mathbf{z}(t),t)=\mathrm{Artificial~Neural~Network}}_{\mathrm{Neural~ODE}}").move_to([0,-2,0]))
         main_contributions_box = RoundedRectangle(
             width=main_contribution.get_width() + 0.5,  # Add padding
             height=main_contribution.get_height() + 0.5,  # Add padding
@@ -380,7 +405,7 @@ class Presentation(InteractiveScene):
                               Uncreate(ax_pd_y_label)))
         self.play(*[Uncreate(vm) for vm in animated_lines])
         self.play(Uncreate(main_contribution[1][::-1]))
-        # self.wait(5)
+
         
         
         # Overview Poisson Latent Neural Differential Equations for Spiking Neural Data
@@ -404,7 +429,7 @@ class Presentation(InteractiveScene):
         plnde_mapping_group.add(box_mapping)
         
         plnde_spike_eq = Tex(R"t_1,\ldots,t_N\sim\mathrm{PoissonProcess(\lambda(t))}",font_size=24)
-        plnde_spike_cap = TexText(r"\textbf{Spike Train}",font_size=32).next_to(plnde_spike_eq,DOWN)
+        plnde_spike_cap = TexText(r"\textbf{Spike Data}",font_size=32).next_to(plnde_spike_eq,DOWN)
         plnde_spike_group = Group()
         plnde_spike_group.add(plnde_spike_eq)
         plnde_spike_group.add(plnde_spike_cap)
@@ -414,8 +439,8 @@ class Presentation(InteractiveScene):
         
         arr_neural_ode_map = Arrow(box_neural_ode.get_edge_center(RIGHT)+np.array([0,0.25,0]), box_mapping.get_edge_center(LEFT)+np.array([0,0.25,0]),buff=0,path_arc=-0.8)
         arr_map_spike = Arrow(box_mapping.get_edge_center(RIGHT)+np.array([0,0.25,0]), box_spike.get_edge_center(LEFT)+np.array([0,0.25,0]),buff=0,path_arc=-0.8)
-        arr_map_neural_ode = Arrow( box_mapping.get_edge_center(LEFT)+np.array([0,-0.25,0]),box_neural_ode.get_edge_center(RIGHT)+np.array([0,-0.25,0]),buff=0,path_arc=-0.8)
-        arr_spike_map = Arrow(box_spike.get_edge_center(LEFT)+np.array([0,-0.25,0]),box_mapping.get_edge_center(RIGHT)+np.array([0,-0.25,0]),buff=0,path_arc=-0.8)
+        arr_map_neural_ode = Arrow( box_mapping.get_edge_center(LEFT)+np.array([0,-0.25,0]),box_neural_ode.get_edge_center(RIGHT)+np.array([0,-0.25,0]),buff=0,path_arc=-0.8).set_fill(RED)
+        arr_spike_map = Arrow(box_spike.get_edge_center(LEFT)+np.array([0,-0.25,0]),box_mapping.get_edge_center(RIGHT)+np.array([0,-0.25,0]),buff=0,path_arc=-0.8).set_fill(RED)
         
         arr_generation = Arrow(box_neural_ode.get_edge_center(LEFT)+1.5*UP, box_spike.get_edge_center(RIGHT)+1.5*UP,buff=0).set_fill(GREY).set_stroke(GREY,0)
         arr_generation_label = TexText(R"Generative Process", font_size=24,t2c={"Generative Process":GREY}).move_to(arr_generation.get_center()+0.25*UP)
@@ -445,7 +470,11 @@ class Presentation(InteractiveScene):
                               GrowArrow(arr_inference)))
         self.wait()
         self.play(LaggedStart(GrowArrow(arr_spike_map),
-                              GrowArrow(arr_map_neural_ode),lag_ratio=0.8))
+                              GrowArrow(arr_map_neural_ode),
+                              plnde_mapping_eq[9].animate.set_color(RED),
+                              plnde_mapping_eq[-2].animate.set_color(RED),
+                              plnde_neural_ode_eq[6:9].animate.set_color(RED),
+                              lag_ratio=0.8))
         self.wait()
         self.play(LaggedStart(ShowCreation(plnde_brace),
                               Write(plnde_brace_cap)))
@@ -472,6 +501,8 @@ class Presentation(InteractiveScene):
         # Experiments
         experiments_title = TexText("Experiments")
         experiments_synth = TexText("Synthetic Experiments").to_edge(UP+LEFT)
+        experiments_synth_list = Group(TexText("Spiral Dynamics",font_size=32).move_to(UP), TexText("FitzHugh-Nagumo Dynamics",font_size=32),TexText("Mutual Inhibition Dynamics",font_size=32).move_to(DOWN))
+        spiral_dynamics_title = TexText("Spiral Dynamics").to_edge(UP+LEFT)
         experiments_animal = TexText("Animal Experiments").to_edge(UP+LEFT)
         fig2 = ImageMobject("./figures/fig2_cropped_dark.png",height=6).move_to([0,-0.5,5])
         fig4 = ImageMobject("./figures/fig4_cropped_dark.png",height=4).move_to([-4,-5,5])
@@ -483,10 +514,20 @@ class Presentation(InteractiveScene):
         self.play(Write(experiments_title))
         self.wait()
         self.play(Transform(experiments_title,experiments_synth))
-        self.play(LaggedStart(FadeIn(fig2),
+        self.play(Write(experiments_synth_list[0]))
+        self.wait()
+        self.play(Write(experiments_synth_list[1]))
+        self.wait()
+        self.play(Write(experiments_synth_list[2]))
+        self.wait()
+        self.play(LaggedStart(Uncreate(experiments_title),
+                              Uncreate(experiments_synth_list[1]),
+                              Uncreate(experiments_synth_list[2]),
+                              Transform(experiments_synth_list[0],spiral_dynamics_title),
+                              FadeIn(fig2),
                               fig2.animate.move_to([0,-0.5,0])))
         self.wait()
-        self.play(LaggedStart(Transform(experiments_title,experiments_animal),
+        self.play(LaggedStart(Transform(experiments_synth_list[0],experiments_animal),
                               Rotate(fig2, angle=PI/2, axis=UP, about_point=RIGHT * FRAME_WIDTH/2, run_time=2),
                               fig2.animate.move_to([0,-0.5,5]),
                               FadeOut(fig2),
@@ -528,7 +569,7 @@ class Presentation(InteractiveScene):
         cons_list.add(TexText(R"\flushleft{The number of neurons for the synthetic dataset\\appears arbitrary.}", font_size=24).align_to(cons_list[-1].get_corner(LEFT+DOWN)+LIST_VERT_SEP*DOWN,UL))
         cons_list.add(TexText(R"\flushleft{The published code only contains the code to run\\the simplest of the synthetic datasets.}", font_size=24).align_to(cons_list[-1].get_corner(LEFT+DOWN)+LIST_VERT_SEP*DOWN,UL))
         
-        self.play(Transform(experiments_title, conclusions_title))
+        self.play(Transform(experiments_synth_list[0], conclusions_title))
         # self.add(conclusions_title)
         self.wait()
         self.play(LaggedStart(ShowCreation(pros_line),
