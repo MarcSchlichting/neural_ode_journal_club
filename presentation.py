@@ -12,7 +12,7 @@ class Presentation(InteractiveScene):
         # explanation_path = CubicBezier(get_smooth_cubic_bezier_handle_points([[0,0,0],[1,1,0],[3,5,0]]))
         arr = Arrow([-1,-0.5,0], [1,0.5,0])
         
-        motivation_texts  = [TexText(r"This a mathematically dense paper."), TexText(r"The introduced models might be helpful\\for a lot of you in systems neuroscience."), TexText(r"We will build the modeling framework from the end.").move_to(2*DOWN)]
+        motivation_texts  = [TexText(r"This a mathematically dense paper."), TexText(r"The introduced models might be helpful\\for a lot of you in systems neuroscience."), TexText(r"We will build the modeling framework from\\the experimental side.").move_to(2*DOWN)]
         
         hh_vm = np.loadtxt("./data/hh_simulation_vm.txt")[:,::8]
         hh_t = np.loadtxt("./data/hh_simulation_t.txt")[:,::8]
@@ -63,10 +63,10 @@ class Presentation(InteractiveScene):
             for dot in dots
         )
         self.play(Write(spike_title))
-        self.wait()
         self.add(dots)
         self.add(tail)
         trails.set_opacity(0)
+        self.wait()
         self.play(
             *(
                 ShowCreation(curve, rate_func=linear)
