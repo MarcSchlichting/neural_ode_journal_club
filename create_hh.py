@@ -22,7 +22,7 @@ for i in range(num_neurons):
     # Create a NetStim to generate a spike train
     netstim = h.NetStim()
     netstim.start = 0  # Start of the spike train (ms)
-    netstim.number = 10  # Total number of spikes
+    netstim.number = 100  # Total number of spikes
     netstim.interval = 20  # Interval between spikes (ms)
     netstim.noise = 1  # Deterministic (0) or stochastic (1) spike train
 
@@ -36,7 +36,7 @@ for i in range(num_neurons):
     netcon.weight[0] = 0.1  # Synaptic weight
 
     # Run the simulation
-    h.tstop = 200  # Total simulation time (ms)
+    h.tstop = 400  # Total simulation time (ms)
     h.run()
     
     times.append(time)

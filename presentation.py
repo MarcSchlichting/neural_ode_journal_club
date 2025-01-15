@@ -2,56 +2,80 @@ from manimlib import *
 
 class Presentation(InteractiveScene):
     def construct(self):
-        paper_title = TexText(r"Inferring Latent Dynamics Underlying Neural\\Population Activity via Neural Differential Equations").move_to(0.5 * UP)
-        authors = TexText(r"Timothy D. Kim, Thomas Z. Luo, Jonathan W. Pillow, Carlos D. Brody",font_size=20).move_to(0.5 * DOWN)
-        orchestra_img = ImageMobject("./figures/orchestra.jpg").move_to(UP)
-        orchstra_cedit = TexText(r"Image Source: Berliner Philharmoniker", font_size=12).to_edge(DOWN+RIGHT, buff=0.2)
-        orchestra_latent_text = TexText(r"Like musicians in an orchestra, neurons\\follow underlying \textbf{latent} dynamics.").move_to(2 * DOWN)
-        latent_explanation = TexText(r"something that is hidden or not immediateley obvious", font_size=24).move_to(DOWN+LEFT)
-        # explanation_path = Line([-1,-1,0],[1,1,0])
-        # explanation_path = CubicBezier(get_smooth_cubic_bezier_handle_points([[0,0,0],[1,1,0],[3,5,0]]))
-        arr = Arrow([-1,-0.5,0], [1,0.5,0])
+        # paper_title = TexText(r"Inferring Latent Dynamics Underlying Neural\\Population Activity via Neural Differential Equations").move_to(0.5 * UP)
+        # authors = TexText(r"Timothy D. Kim, Thomas Z. Luo, Jonathan W. Pillow, Carlos D. Brody",font_size=20).move_to(0.5 * DOWN)
+        # orchestra_img = ImageMobject("./figures/orchestra.jpg").move_to(UP)
+        # orchstra_cedit = TexText(r"Image Source: Berliner Philharmoniker", font_size=12).to_edge(DOWN+RIGHT, buff=0.2)
+        # orchestra_latent_text = TexText(r"Like musicians in an orchestra, neurons\\follow underlying \textbf{latent} dynamics.").move_to(2 * DOWN)
+        # latent_explanation = TexText(r"something that is hidden or not immediateley obvious", font_size=24).move_to(DOWN+LEFT)
+        # # explanation_path = Line([-1,-1,0],[1,1,0])
+        # # explanation_path = CubicBezier(get_smooth_cubic_bezier_handle_points([[0,0,0],[1,1,0],[3,5,0]]))
+        # arr = Arrow([-1,-0.5,0], [1,0.5,0])
         
-        motivation_texts  = [TexText(r"This a mathematically dense paper."), TexText(r"The introduced models might be helpful\\for a lot of you in systems neuroscience."), TexText(r"We will build the modeling framework from the end.").move_to(2*DOWN)]
+        # motivation_texts  = [TexText(r"This a mathematically dense paper."), TexText(r"The introduced models might be helpful\\for a lot of you in systems neuroscience."), TexText(r"We will build the modeling framework from the end.").move_to(2*DOWN)]
         
         hh_vm = np.loadtxt("./data/hh_simulation_vm.txt")[:,::8]
         hh_t = np.loadtxt("./data/hh_simulation_t.txt")[:,::8]
         
         
-        # Title Slide
-        self.wait()
-        self.play(LaggedStart(Write(paper_title), Write(authors), lag_ratio=1))
-        self.wait()
-        self.play(LaggedStart(Uncreate(authors[::-1]), Uncreate(paper_title),lag_ratio=0.5))
+        # # Title Slide
+        # self.wait()
+        # self.play(LaggedStart(Write(paper_title), Write(authors), lag_ratio=1))
+        # self.wait()
+        # self.play(LaggedStart(Uncreate(authors[::-1]), Uncreate(paper_title),lag_ratio=0.5))
         
-        # Slide with Orchestra Picture
-        self.play(LaggedStart(FadeIn(orchestra_img), FadeIn(orchstra_cedit)))
-        self.play(Write(orchestra_latent_text))
-        self.wait()
-        self.play(LaggedStart(FadeOut(orchestra_img),FadeOut(orchstra_cedit), MoveAlongPath(orchestra_latent_text, Line(2 * DOWN, UP))))
-        self.play(LaggedStart(orchestra_latent_text[50:56].animate.set_color(RED), ShowCreation(arr)))
-        self.play(Write(latent_explanation))
-        self.wait()
-        self.play(LaggedStart(Uncreate(orchestra_latent_text), Uncreate(latent_explanation), FadeOut(arr)))
+        # # Slide with Orchestra Picture
+        # self.play(LaggedStart(FadeIn(orchestra_img), FadeIn(orchstra_cedit)))
+        # self.play(Write(orchestra_latent_text))
+        # self.wait()
+        # self.play(LaggedStart(FadeOut(orchestra_img),FadeOut(orchstra_cedit), MoveAlongPath(orchestra_latent_text, Line(2 * DOWN, UP))))
+        # self.play(LaggedStart(orchestra_latent_text[50:56].animate.set_color(RED), ShowCreation(arr)))
+        # self.play(Write(latent_explanation))
+        # self.wait()
+        # self.play(LaggedStart(Uncreate(orchestra_latent_text), Uncreate(latent_explanation), FadeOut(arr)))
         
-        # Motivation Slide
-        self.play(Write(motivation_texts[0]))
-        self.wait()
-        self.play(LaggedStart(motivation_texts[0].animate.move_to(2*UP), Write(motivation_texts[1]),lag_ratio=0.5))
-        self.wait()
-        self.play(Write(motivation_texts[2]))
-        self.wait()
-        self.play(LaggedStart(*[Uncreate(mt) for mt in motivation_texts]))
+        # # Motivation Slide
+        # self.play(Write(motivation_texts[0]))
+        # self.wait()
+        # self.play(LaggedStart(motivation_texts[0].animate.move_to(2*UP), Write(motivation_texts[1]),lag_ratio=0.5))
+        # self.wait()
+        # self.play(Write(motivation_texts[2]))
+        # self.wait()
+        # self.play(LaggedStart(*[Uncreate(mt) for mt in motivation_texts]))
         
-        # # Spike Recordings
-        # ax = [Axes([0,hh_t.max()],[hh_vm.min(), hh_vm.max()],height=0.4,width=6).to_edge(UP,buff=1).to_edge(LEFT,buff=1)]
-        # # ax[0].get_y_axis_label("V_0",edge=[0,0,0])
-        # xs = [np.stack([hh_t[0],hh_vm[0]],axis=1)]
-        # for i in range(1,hh_vm.shape[0]):
-        #     ax.append(Axes([0,hh_t.max()],[hh_vm.min(), hh_vm.max()],height=0.4,width=6).next_to(ax[-1],DOWN))
-        #     xs.append(np.stack([hh_t[i],hh_vm[i]],axis=1))
-        # self.play(LaggedStart([Write(TexText("Neuronal Voltage Recordings",font_size=20).next_to(ax[0],UP))]+[Write(Tex(fr"V_{{{i+1}}}",font_size=20).next_to(a,LEFT)) for i,a in enumerate(ax)]))
-        # self.play(*[ShowCreation(VMobject().set_points(ax[i].c2p(*xs[i].T)).set_stroke(BLUE_B, 2),rate_func=linear,run_time=10) for i in range(len(xs))])
+        # Spike Recordings
+        spike_title = TexText("Spike Data").to_edge(UP+LEFT)
+        alpha = ValueTracker(0)
+        ax = [Axes([0,hh_t.max()],[hh_vm.min(), hh_vm.max()],height=0.4,width=15).to_edge(UP,buff=1)]
+        # ax[0].get_y_axis_label("V_0",edge=[0,0,0])
+        xs = [np.stack([hh_t[0],hh_vm[0]],axis=1)]
+        for i in range(1,hh_vm.shape[0]):
+            ax.append(Axes([0,hh_t.max()],[hh_vm.min(), hh_vm.max()],height=0.4,width=15).next_to(ax[-1],DOWN))
+            xs.append(np.stack([hh_t[i],hh_vm[i]],axis=1))
+        trails = VGroup(*[VMobject().set_points(ax[i].c2p(*xs[i].T)).set_stroke(BLUE_B, 2) for i in range(len(xs))])
+        dots = Group(GlowDot(color=BLUE, radius=0.15) for i,x in enumerate(xs))
+        def update_dots(dots, curves=trails):
+            for dot, curve in zip(dots, curves):
+                dot.move_to(curve.quick_point_from_proportion(alpha.get_value()))
+        dots.add_updater(update_dots)
+        tail = VGroup(
+            TracingTail(dot, time_traced=10).match_color(dot)
+            for dot in dots
+        )
+        self.play(Write(spike_title))
+        self.wait()
+        self.add(dots)
+        self.add(tail)
+        trails.set_opacity(0)
+        self.play(
+            *(
+                ShowCreation(curve, rate_func=linear)
+                for curve in trails
+            ), alpha.animate.set_value(1),rate_func=linear,
+            run_time=20,
+        )
+        self.wait()
+        self.play(Uncreate(spike_title))
 
         
         
@@ -87,9 +111,9 @@ class Presentation(InteractiveScene):
         self.wait()
         self.play(Write(poisson_tex_one))
         self.wait()
-        self.play(LaggedStart(Write(spike_times[::-1]),*[ShowCreation(stc) for stc in spike_time_curves]))
-        self.wait()
         self.play(LaggedStart(Write(firing_rate),ShowCreation(firing_rate_curve)))
+        self.wait()
+        self.play(LaggedStart(Write(spike_times[::-1]),*[ShowCreation(stc) for stc in spike_time_curves]))
         self.wait()
         self.play(LaggedStart(Uncreate(spike_times),
                               *[Uncreate(stc) for stc in spike_time_curves],
@@ -104,7 +128,7 @@ class Presentation(InteractiveScene):
         # From Firing Rate to Latent Variables
         fr_to_lv_title = TexText("From Firing Rates to Latent Variables").to_edge(UP+LEFT)
         exp_aff_map_short = Tex(R"""
-                          \mathbf{\lambda} = \mathrm{exp}\left(\mathbf{A}\mathbf{z}(t) + \mathbf{b}\right)
+                          \mathbf{\lambda}(t) = \mathrm{exp}\left(\mathbf{A}\mathbf{z}(t) + \mathbf{b}\right)
                           """)
         exp_aff_map_long = Tex(R"""
                           \begin{bmatrix}
@@ -498,9 +522,9 @@ class Presentation(InteractiveScene):
         pros_list.add(TexText(R"\flushleft{Paper is well written and color scheme in figures\\is chosen consistently.}", font_size=24).align_to(pros_list[-1].get_corner(LEFT+DOWN)+LIST_VERT_SEP*DOWN,UL))
         pros_list.add(TexText(R"\flushleft{The discussion section of the paper discusses some\\limitations of their approach.}", font_size=24).align_to(pros_list[-1].get_corner(LEFT+DOWN)+LIST_VERT_SEP*DOWN,UL))
         
-        cons_list = Group(TexText(R"\flushleft{Validation of their model is only possible for synthetic\\data as now ground truth data exists real data.}", font_size=24).align_to(cons_line.get_start()+LIST_VERT_SEP*DOWN,UL))
-        cons_list.add(TexText(R"\flushleft{The model has no uncertainty measure (i.e., is\\a point estimate).}", font_size=24).align_to(cons_list[-1].get_corner(LEFT+DOWN)+LIST_VERT_SEP*DOWN,UL))
+        cons_list = Group(TexText(R"\flushleft{Validation of their model is only possible for synthetic\\data as no ground truth data exists for real data.}", font_size=24).align_to(cons_line.get_start()+LIST_VERT_SEP*DOWN,UL))
         cons_list.add(TexText(R"\flushleft{All 3 synthetic datasets have rather simple low-\\dimensional latent dynamics.}", font_size=24).align_to(cons_list[-1].get_corner(LEFT+DOWN)+LIST_VERT_SEP*DOWN,UL))
+        cons_list.add(TexText(R"\flushleft{The model has no uncertainty measure (i.e., is\\a point estimate).}", font_size=24).align_to(cons_list[-1].get_corner(LEFT+DOWN)+LIST_VERT_SEP*DOWN,UL))
         cons_list.add(TexText(R"\flushleft{The number of neurons for the synthetic dataset\\appears arbitrary.}", font_size=24).align_to(cons_list[-1].get_corner(LEFT+DOWN)+LIST_VERT_SEP*DOWN,UL))
         cons_list.add(TexText(R"\flushleft{The published code only contains the code to run\\the simplest of the synthetic datasets.}", font_size=24).align_to(cons_list[-1].get_corner(LEFT+DOWN)+LIST_VERT_SEP*DOWN,UL))
         
