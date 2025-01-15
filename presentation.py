@@ -168,15 +168,15 @@ class Presentation(InteractiveScene):
         latent_dynamic_intro_text = TexText(r"Given a latent state $\mathbf{z}$, what\\is the rate of change of the latent variables?")
         latent_ode = Tex(R"\dfrac{\mathrm{d}\mathbf{z}}{\mathrm{d}t} = f(\mathbf{z}(t),\mathbf{u}(t),t)")
         latent_change = TexText("Latent Variables Rate of Change",font_size=24).next_to(np.array([-2,2,0]),LEFT)
-        latent_change_curve = CubicBezier(np.array([-2,2,0]),np.array([-2,2,0])+2 *RIGHT,np.array([-1.2,0.6,0])+UP,np.array([-1.2,0.6,0])).set_stroke(WHITE,2)
+        latent_change_curve = CubicBezier(np.array([-2,2,0]),np.array([-2,2,0])+2 *RIGHT,np.array([-1.7,0.6,0])+UP,np.array([-1.7,0.6,0])).set_stroke(WHITE,2)
         f_exp = TexText("An Arbitrary Non-Linear Function",font_size=24).next_to(np.array([-2,-1.5,0]),LEFT)
-        f_exp_curve = CubicBezier(np.array([-2,-1.5,0]),np.array([-2,-1.5,0])+RIGHT,np.array([-0.15,-0.4,0])+DOWN,np.array([-0.15,-0.4,0])).set_stroke(WHITE,2)
+        f_exp_curve = CubicBezier(np.array([-2,-1.5,0]),np.array([-2,-1.5,0])+RIGHT,np.array([-0.75,-0.4,0])+DOWN,np.array([-0.75,-0.4,0])).set_stroke(WHITE,2)
         z_exp = TexText(r"\begin{flushleft}Current Values\\of Latent Variables\end{flushleft}",font_size=24).next_to(np.array([1,2.5,0]),RIGHT)
-        z_exp_curve = CubicBezier(np.array([1,2.5,0]),np.array([1,2.5,0])+2 * LEFT,np.array([0.3,0.2,0])+UP, np.array([0.3,0.2,0])).set_stroke(WHITE,2)
-        t_exp = TexText("Time",font_size=24).next_to(np.array([1,-2,0]),RIGHT)
-        t_exp_curve = CubicBezier(np.array([1,-2,0]),np.array([1,-2,0])+LEFT, np.array([0.75,-0.25,0])+DOWN, np.array([0.75,-0.25,0])).set_stroke(WHITE,2)
+        z_exp_curve = CubicBezier(np.array([1,2.5,0]),np.array([1,2.5,0])+2 * LEFT,np.array([-0.25,0.2,0])+UP, np.array([-0.25,0.2,0])).set_stroke(WHITE,2)
+        t_exp = TexText("Time",font_size=24).next_to(np.array([1.5,-2,0]),RIGHT)
+        t_exp_curve = CubicBezier(np.array([1.5,-2,0]),np.array([1.5,-2,0])+LEFT, np.array([1.8,-0.25,0])+DOWN, np.array([1.8,-0.25,0])).set_stroke(WHITE,2)
         u_exp = TexText("Input",font_size=24).next_to(np.array([3.5,1.5,0]),RIGHT)
-        u_exp_curve = CubicBezier(np.array([3.5,1.5,0]),np.array([3.5,1.5,0])+3.5 * LEFT,np.array([1.2,0.2,0])+UP,np.array([1.2,0.2,0])).set_stroke(WHITE,2)
+        u_exp_curve = CubicBezier(np.array([3.5,1.5,0]),np.array([3.5,1.5,0])+3.5 * LEFT,np.array([0.8,0.2,0])+UP,np.array([0.8,0.2,0])).set_stroke(WHITE,2)
         ode_text = TexText(r"\textbf{O}rdinary \textbf{D}ifferential \textbf{E}quation",t2c={r"\textbf{O}rdinary \textbf{D}ifferential \textbf{E}quation":RED}).move_to(np.array([0,2,0])).to_edge(LEFT)
         example_ode = TexText(r"Example: $\frac{\mathrm{d}z}{\mathrm{d}t}=\mathrm{cos}(t)\quad z(0)=0$").move_to(np.array([0,1,0])).to_edge(LEFT)
         ax_ode_example = Axes([0,3],[0,1.5],width=8,height=3).move_to([0,-1.5,0])
@@ -213,7 +213,8 @@ class Presentation(InteractiveScene):
         euler_line_start = ax_ode_example.c2p(*np.array([-0.2,-0.2,0]))
         euler_line_end = ax_ode_example.c2p(*np.array([0.2,0.2,0]))
         euler_line = Line(euler_line_start,euler_line_end).set_stroke(BLUE)
-        gd_ode_example = Dot(ax_ode_example.c2p(*[0,0,0]),color=WHITE)
+        gd_ode_example = GlowDot(ax_ode_example.c2p(*[0,0,0]),color=RED)
+        # gd_ode_example = Dot(radius=0.2, color=RED).move_to(ax_ode_example.c2p(*[0,0,0]))
         gd_ode_example.add_updater(update_glow_dot)
         
         self.play(Transform(poisson_process_title,latent_dynamics_title))
@@ -232,6 +233,7 @@ class Presentation(InteractiveScene):
         self.play(LaggedStart(Write(t_exp),ShowCreation(t_exp_curve)))
         self.wait()
         self.play(LaggedStart(Write(u_exp),ShowCreation(u_exp_curve)))
+        # self.add(NumberPlane())
         self.wait()
         self.play(LaggedStart(Uncreate(latent_change[::-1]),
                               Uncreate(latent_change_curve),
@@ -292,7 +294,7 @@ class Presentation(InteractiveScene):
                             #   Uncreate(main_contribution[1]),
                               Uncreate(latent_dynamic_intro_text[::-1]),
                               Uncreate(ode_text),
-                              Uncreate(latent_dynamics_title[::-1])))
+                              Uncreate(poisson_process_title[::-1])))
         
         # Phase Diagram
         phase_dig_title = TexText("Latent Dynamics Interpretability")
@@ -338,10 +340,10 @@ class Presentation(InteractiveScene):
                                    )
         animated_lines = AnimatedStreamLines(stream_lines,rate_multiple=1,line_anim_config=dict(time_width=3))
         
-        # self.play(Transform(main_contribution[1], phase_dig_title))
+        self.play(Transform(main_contribution[1], phase_dig_title))
         self.wait()
-        # self.play(main_contribution[1].animate.to_edge(LEFT+UP))
-        self.add(phase_dig_title.to_edge(LEFT+UP))
+        self.play(main_contribution[1].animate.to_edge(LEFT+UP))
+        # self.add(phase_dig_title.to_edge(LEFT+UP))
         self.add(stream_lines)
         self.add(animated_lines)
         self.wait()
@@ -353,7 +355,7 @@ class Presentation(InteractiveScene):
                               Uncreate(ax_pd_x_label),
                               Uncreate(ax_pd_y_label)))
         self.play(*[Uncreate(vm) for vm in animated_lines])
-        self.play(Uncreate(phase_dig_title[::-1]))
+        self.play(Uncreate(main_contribution[1][::-1]))
         # self.wait(5)
         
         
@@ -437,7 +439,8 @@ class Presentation(InteractiveScene):
                               FadeOut(arr_spike_map),
                               FadeOut(arr_map_neural_ode),
                               Uncreate(plnde_brace),
-                              Uncreate(plnde_brace_cap)))
+                              Uncreate(plnde_brace_cap),
+                              Uncreate(plnde_title)))
         
         
         
@@ -453,7 +456,6 @@ class Presentation(InteractiveScene):
         fig4_annot_box = RoundedRectangle(fig4_annot_no_neurons.get_width()+0.4,fig4_annot_no_neurons.get_height()+0.4,corner_radius=0.22).set_stroke(WHITE,2).move_to(fig4_annot_no_neurons.get_center())
         fig4_annot_path = CubicBezier(fig4_annot_box.get_edge_center(DOWN),fig4_annot_box.get_edge_center(DOWN)+DOWN,np.array([-0.7,0.4,0])+UP, np.array([-0.7,0.4,0])).set_stroke(WHITE,2)
         
-        self.wait()
         self.play(Write(experiments_title))
         self.wait()
         self.play(Transform(experiments_title,experiments_synth))
