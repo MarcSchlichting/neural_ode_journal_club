@@ -6,6 +6,8 @@
 
 This is repository contains the code that was used for the presentation in NEPR 280 on the paper *Inferring Latent Dynamics Underlying Neural Population Activity via Neural Differential Equations*. The entire presentation was done using Grant Sanderson's (aka 3Blue1Brown) **Manim** library (not the community edition). Below are some quick hints on requirements and commands.
 
+A link to the completely rendered video is [here](https://drive.google.com/file/d/1eXWW-0DE4RcugV0R5M39BaKpZMjARw1c/view?usp=sharing).
+
 ## Requirements
 I made a couple of small tweaks to Grant's *Manim* by forking his repo. If you are using Grant's version, you will run into issues with the phase plots and using a remote for presenting won't work.
 
