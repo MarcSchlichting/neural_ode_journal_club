@@ -1,4 +1,9 @@
 # Journal Club (Presentation) - Inferring Latent Dynamics Underlying Neural Population Activity via Neural Differential Equations
+<video width="640" height="360" controls>
+  <source src="./videos/NeuralODEs_Neuroscience_JC.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
 This is repository contains the code that was used for the presentation in NEPR 280 on the paper *Inferring Latent Dynamics Underlying Neural Population Activity via Neural Differential Equations*. The entire presentation was done using Grant Sanderson's (aka 3Blue1Brown) **Manim** library (not the community edition). Below are some quick hints on requirements and commands.
 
 ## Requirements
